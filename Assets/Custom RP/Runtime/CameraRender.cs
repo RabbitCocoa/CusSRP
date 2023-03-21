@@ -10,6 +10,16 @@ using UnityEngine.Rendering;
 
 public partial class CameraRender
 {
+
+    public CameraRender(bool dynamicBatching,bool instancing)
+    {
+        this.dynamicBatching = dynamicBatching;
+        this.instancing = instancing;
+    }
+
+    private bool dynamicBatching;
+    private bool instancing;
+    
     private ScriptableRenderContext context;
     private Camera camera;
 
@@ -83,8 +93,11 @@ public partial class CameraRender
         {
             criteria = SortingCriteria.CommonOpaque
         };
-        
+
         var drawSettings = new DrawingSettings(unlitShaderTagId,sortingSettings); //Shader 和 绘制顺序设置
+        drawSettings.enableDynamicBatching = dynamicBatching;
+        drawSettings.enableInstancing = instancing;
+        
         var filteringSettings = new FilteringSettings(RenderQueueRange.opaque); //队列设置
        
 

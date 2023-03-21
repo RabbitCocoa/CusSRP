@@ -10,8 +10,12 @@ using UnityEngine.Rendering;
 
 public class CustomRenderpipeline: RenderPipeline
 {
-    private CameraRender renderer = new CameraRender();
-    
+    private CameraRender renderer;
+
+    public CustomRenderpipeline(bool dynamicBatching,bool instancing)
+    {
+        renderer = new CameraRender(dynamicBatching,instancing);
+    }
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
     {
         foreach (Camera camera in cameras)
