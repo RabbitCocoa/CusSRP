@@ -31,7 +31,7 @@ public partial class CameraRender
         new ShaderTagId("PrepassBase"),
         new ShaderTagId("Vertex"),
         new ShaderTagId("VertexLMRGBM"),
-        new ShaderTagId("VertexLM")
+        new ShaderTagId("VertexLM"),
     };
 
     private static Material errorMaterial;

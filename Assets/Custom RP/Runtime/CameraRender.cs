@@ -10,21 +10,24 @@ using UnityEngine.Rendering;
 
 public partial class CameraRender
 {
-
-    public CameraRender(bool dynamicBatching,bool instancing)
+    private Lighting lighting = new Lighting();
+    public CameraRender()
     {
-        this.dynamicBatching = dynamicBatching;
-        this.instancing = instancing;
+      
     }
 
-    private bool dynamicBatching;
-    private bool instancing;
+
     
     private ScriptableRenderContext context;
     private Camera camera;
 
     private const string bufferName = "Render Camera";
-    static ShaderTagId unlitShaderTagId = new ShaderTagId("SRPDefaultUnlit");
+    static ShaderTagId[] visiableShaderTagIdS =
+    {
+        new ShaderTagId("SRPDefaultUnlit"),
+        new ShaderTagId("CustomLit")
+        
+    };
     
 
     
@@ -33,11 +36,14 @@ public partial class CameraRender
     {
         name = bufferName
     };
-    
-    public void Render(ScriptableRenderContext context, Camera camera)
+
+    private bool dynamicBatching, instancing;
+    public void Render(ScriptableRenderContext context, Camera camera,bool dynamicBatching,bool instancing)
     {
         this.context = context;
         this.camera = camera;
+        this.dynamicBatching = dynamicBatching;
+        this.instancing = instancing;
         
         PrepareBuffer();
         //把UI扔进scene窗口的世界中
@@ -47,6 +53,10 @@ public partial class CameraRender
             return;
         //设置相机属性 
         Setup();
+        
+        //设置光线数据
+        lighting.SetUp(context,cullingResults);
+        
         //绘制物体
         DrawVisibleGeometry();
       
@@ -73,6 +83,7 @@ public partial class CameraRender
      
     }
 
+    
     //裁剪掉看不掉的物体
     bool Cull()
     {
@@ -94,9 +105,13 @@ public partial class CameraRender
             criteria = SortingCriteria.CommonOpaque
         };
 
-        var drawSettings = new DrawingSettings(unlitShaderTagId,sortingSettings); //Shader 和 绘制顺序设置
+        var drawSettings = new DrawingSettings(visiableShaderTagIdS[0],sortingSettings); //Shader 和 绘制顺序设置
         drawSettings.enableDynamicBatching = dynamicBatching;
         drawSettings.enableInstancing = instancing;
+        for (int i = 1; i < visiableShaderTagIdS.Length; i++)
+        {
+            drawSettings.SetShaderPassName(i,visiableShaderTagIdS[i]);
+        }
         
         var filteringSettings = new FilteringSettings(RenderQueueRange.opaque); //队列设置
        

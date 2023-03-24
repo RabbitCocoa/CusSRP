@@ -11,16 +11,20 @@ using UnityEngine.Rendering;
 public class CustomRenderpipeline: RenderPipeline
 {
     private CameraRender renderer;
-
-    public CustomRenderpipeline(bool dynamicBatching,bool instancing)
+    private bool dynamicBatching, instancing;
+    public CustomRenderpipeline(bool dynamicBatching,bool instancing,bool useSRPBatcher)
     {
-        renderer = new CameraRender(dynamicBatching,instancing);
+        this.dynamicBatching = dynamicBatching;
+        this.instancing = instancing;
+        GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
+        GraphicsSettings.lightsUseLinearIntensity = true;
+        renderer = new CameraRender();
     }
     protected override void Render(ScriptableRenderContext context, Camera[] cameras)
     {
         foreach (Camera camera in cameras)
         {
-            renderer.Render(context,camera);
+            renderer.Render(context,camera,dynamicBatching,instancing);
         }
     }
 }

@@ -17,8 +17,11 @@ public class CustomRenderPipelineAsset : RenderPipelineAsset
         set
         {
             enableBatching = value;
-            if(value)
-            enableInstancing = !value;
+            if (value)
+            {
+                enableInstancing = false;
+                enableSRPBatch = false;
+            }
         }
     }
 
@@ -31,13 +34,32 @@ public class CustomRenderPipelineAsset : RenderPipelineAsset
         set
         {
             enableInstancing = value;
-            if(value)
-            enableBatching = !value;
+            if (value)
+            {
+                enableBatching = false;
+                enableSRPBatch = false;
+            }
         }
     }
 
+    private bool enableSRPBatch;
+    [ShowInInspector]
+    private bool EnableSRPBatch
+    {
+        get => enableSRPBatch;
+        set
+        {
+            enableSRPBatch = value;
+            if (value)
+            {
+                enableBatching = false;
+                enableInstancing = false;
+            }
+        }
+    }
+    
     protected override RenderPipeline CreatePipeline()
     {
-        return new CustomRenderpipeline(EnableBathcing, EnableInstancing);
+        return new CustomRenderpipeline(EnableBathcing, EnableInstancing,EnableSRPBatch);
     }
 }
