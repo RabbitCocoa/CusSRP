@@ -35,6 +35,21 @@ Shader "Custom Pipeline/Lit"
             
             ENDHLSL
         }
+        
+        Pass{
+            Tags{
+                "LightMode" = "ShadowCaster"   
+            }    
+            ColorMask 0
+            HLSLPROGRAM
+            #pragma  target3.5
+            #pragma shader_feature _CLIPPING
+            #pragma multi_compile_instancing //支持GPUInstancing
+            #pragma  vertex ShadowPassVertex
+            #pragma  fragment ShadowPassFragment
+            #include "../ShaderLibrary/ShadowCaster.hlsl"
+            ENDHLSL
+        }
     }
     
     CustomEditor "CustomShaderGUI"

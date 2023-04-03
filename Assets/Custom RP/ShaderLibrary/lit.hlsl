@@ -3,6 +3,7 @@
 
 #include"Common.hlsl"
 #include"Surface.hlsl"
+#include"Shadows.hlsl"
 #include"Light.hlsl"
 
 
@@ -25,6 +26,7 @@ UNITY_INSTANCING_BUFFER_START(UnityPerMaterial)
     UNITY_DEFINE_INSTANCED_PROP(float, _Metallic)
     UNITY_DEFINE_INSTANCED_PROP(float, _Smoothness)
 UNITY_INSTANCING_BUFFER_END(UnityPerMaterial)
+
 
 
 
@@ -73,7 +75,7 @@ half4 litPassFragment(VertexOutput output) : SV_TARGET
     surface.alpha = color.a;
     surface.metallic = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial,_Metallic);
     surface.Smoothness = UNITY_ACCESS_INSTANCED_PROP(UnityPerMaterial,_Smoothness);
-
+    surface.position = output.positionWS;
 
     #if defined(_PREMULTIPLY_ALPHA)
     BRDF brdf = GetBRDF(surface, true);

@@ -5,15 +5,20 @@
 描述：
 ************************/
 
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class CustomRenderpipeline: RenderPipeline
 {
+    
+    
     private CameraRender renderer;
     private bool dynamicBatching, instancing;
-    public CustomRenderpipeline(bool dynamicBatching,bool instancing,bool useSRPBatcher)
+    private ShadowSettings ShadowSettings;
+    public CustomRenderpipeline(bool dynamicBatching,bool instancing,bool useSRPBatcher,ShadowSettings shadowSettings)
     {
+        this.ShadowSettings = shadowSettings;
         this.dynamicBatching = dynamicBatching;
         this.instancing = instancing;
         GraphicsSettings.useScriptableRenderPipelineBatching = useSRPBatcher;
@@ -24,7 +29,7 @@ public class CustomRenderpipeline: RenderPipeline
     {
         foreach (Camera camera in cameras)
         {
-            renderer.Render(context,camera,dynamicBatching,instancing);
+            renderer.Render(context,camera,dynamicBatching,instancing,ShadowSettings);
         }
     }
 }

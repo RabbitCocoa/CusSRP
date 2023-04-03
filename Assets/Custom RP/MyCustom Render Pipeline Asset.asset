@@ -12,3 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e74f7ddad09beeb4e8c7eea4b63ac449, type: 3}
   m_Name: MyCustom Render Pipeline Asset
   m_EditorClassIdentifier: 
+  ShadowSettings:
+    maxDistance: 18.35
+    atlasSize: 512

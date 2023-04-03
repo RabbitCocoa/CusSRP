@@ -38,7 +38,7 @@ public partial class CameraRender
     };
 
     private bool dynamicBatching, instancing;
-    public void Render(ScriptableRenderContext context, Camera camera,bool dynamicBatching,bool instancing)
+    public void Render(ScriptableRenderContext context, Camera camera,bool dynamicBatching,bool instancing,ShadowSettings shadowSettings)
     {
         this.context = context;
         this.camera = camera;
@@ -49,13 +49,17 @@ public partial class CameraRender
         //把UI扔进scene窗口的世界中
         PrepareForSceneWindow();
         //裁剪
-        if (!Cull())
+        if (!Cull(shadowSettings.maxDistance))
             return;
+      
+        
+        buffer.BeginSample(SampleName);
+        ExecuteBuffer();
+        //设置光线数据
+        lighting.SetUp(context,cullingResults,shadowSettings);
+        buffer.EndSample(SampleName);
         //设置相机属性 
         Setup();
-        
-        //设置光线数据
-        lighting.SetUp(context,cullingResults);
         
         //绘制物体
         DrawVisibleGeometry();
@@ -63,6 +67,9 @@ public partial class CameraRender
         //绘制不支持的shader
         DrawUnsupportedShaders();
         DrawGizmos();
+        //清理操作
+ 
+        lighting.CleanUp();
         //提交指令
         Submit();
     }
@@ -85,12 +92,13 @@ public partial class CameraRender
 
     
     //裁剪掉看不掉的物体
-    bool Cull()
+    bool Cull(float maxDistance)
     {
         //获取相机的裁剪参数
         if (camera.TryGetCullingParameters(out ScriptableCullingParameters p))
         {
             //通过裁剪参数获得一个裁剪结果
+            p.shadowDistance = Mathf.Min(camera.farClipPlane, maxDistance);
             cullingResults = context.Cull(ref p);
             return true;
         }

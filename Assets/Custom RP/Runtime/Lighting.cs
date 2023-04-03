@@ -17,13 +17,14 @@ public class Lighting
     static int
         dirLightCountId = Shader.PropertyToID("_DirectionalLightCount"),
         dirLightColorId = Shader.PropertyToID("_DirectionalLightColors"),
-        dirLightDirectionId = Shader.PropertyToID("_DirectionalLightDirections");
+        dirLightDirectionId = Shader.PropertyToID("_DirectionalLightDirections"),
+          dirLightShadowDataId = Shader.PropertyToID("_DirectionalLightShadowData");
 
     //传递给GPU的数据
     private static Vector4[]
         dirLightColors = new Vector4[maxDirLightCount],
-        dirLightDirections = new Vector4[maxDirLightCount];
-    
+        dirLightDirections = new Vector4[maxDirLightCount],
+         dirLightShadowData = new Vector4[maxDirLightCount];
     
     private CommandBuffer buffer = new CommandBuffer()
     {
@@ -33,17 +34,27 @@ public class Lighting
     private CullingResults CullingResults;
 
     private const int maxDirLightCount = 4;
-    public void SetUp(ScriptableRenderContext context,CullingResults results)
+
+    private Shadow shadow = new Shadow();
+    public void SetUp(ScriptableRenderContext context,CullingResults results,ShadowSettings shadowSettings)
     {
         this.CullingResults = results;
         
         
         buffer.BeginSample(bufferName);
+        shadow.SetUp(context, results, shadowSettings);
         SetUpLights();
+        shadow.Render();
+        
     //    SetupDirectionLight();
         buffer.EndSample(bufferName);
         context.ExecuteCommandBuffer(buffer);
         buffer.Clear();
+    }
+    
+    public void CleanUp()
+    {
+        shadow.CleanUp();
     }
 
     //设置灯光数量 裁剪
@@ -66,11 +77,15 @@ public class Lighting
         buffer.SetGlobalInt(dirLightCountId,visibleLights.Length);
         buffer.SetGlobalVectorArray(dirLightColorId,dirLightColors);
         buffer.SetGlobalVectorArray(dirLightDirectionId,dirLightDirections);
+        buffer.SetGlobalVectorArray(dirLightShadowDataId,dirLightShadowData);
     }
 
     //设置直接光数据给GPU
     void SetupDirectionLight(int index,ref VisibleLight visibleLight)
     {
+        dirLightShadowData[index] = shadow.ReserveDirectionalShadows(visibleLight.light,index);
+
+        
         dirLightColors[index] = visibleLight.finalColor;
         //取第二列 即y轴方向
         dirLightDirections[index] = -visibleLight.localToWorldMatrix.GetColumn(2);

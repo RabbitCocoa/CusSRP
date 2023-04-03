@@ -58,8 +58,11 @@ public class CustomRenderPipelineAsset : RenderPipelineAsset
         }
     }
     
+    [SerializeField]
+    private ShadowSettings ShadowSettings;
+    
     protected override RenderPipeline CreatePipeline()
     {
-        return new CustomRenderpipeline(EnableBathcing, EnableInstancing,EnableSRPBatch);
+        return new CustomRenderpipeline(EnableBathcing, EnableInstancing,EnableSRPBatch,ShadowSettings);
     }
 }
