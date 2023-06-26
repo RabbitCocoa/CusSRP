@@ -1,68 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
-using Sirenix.OdinInspector;
-using Unity.VisualScripting;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 
 [CreateAssetMenu(menuName = "Rendering/Custom Render Pipeline")]
-public class CustomRenderPipelineAsset : RenderPipelineAsset
-{
-    private bool enableBatching;
+public class CustomRenderPipelineAsset : RenderPipelineAsset {
 
-    [ShowInInspector]
-    private bool EnableBathcing
-    {
-        get => enableBatching;
-        set
-        {
-            enableBatching = value;
-            if (value)
-            {
-                enableInstancing = false;
-                enableSRPBatch = false;
-            }
-        }
-    }
+	[SerializeField]
+	bool useDynamicBatching = true, useGPUInstancing = true, useSRPBatcher = true;
 
-    private bool enableInstancing;
+	[SerializeField]
+	ShadowSettings shadows = default;
 
-    [ShowInInspector]
-    private bool EnableInstancing
-    {
-        get => enableInstancing;
-        set
-        {
-            enableInstancing = value;
-            if (value)
-            {
-                enableBatching = false;
-                enableSRPBatch = false;
-            }
-        }
-    }
-
-    private bool enableSRPBatch;
-    [ShowInInspector]
-    private bool EnableSRPBatch
-    {
-        get => enableSRPBatch;
-        set
-        {
-            enableSRPBatch = value;
-            if (value)
-            {
-                enableBatching = false;
-                enableInstancing = false;
-            }
-        }
-    }
-    
-    [SerializeField]
-    private ShadowSettings ShadowSettings;
-    
-    protected override RenderPipeline CreatePipeline()
-    {
-        return new CustomRenderpipeline(EnableBathcing, EnableInstancing,EnableSRPBatch,ShadowSettings);
-    }
+	protected override RenderPipeline CreatePipeline () {
+		return new CustomRenderPipeline(
+			useDynamicBatching, useGPUInstancing, useSRPBatcher, shadows
+		);
+	}
 }
